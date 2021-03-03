@@ -1,0 +1,27 @@
+{
+  "name": "@si14/si-usbd",
+  "version": "1.0.0",
+  "description": "USB device library",
+  "scripts": {
+    "build": "doxygen"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/burgrp/si-usbd.git"
+  },
+  "author": "Pavel Burgr",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/burgrp/si-usbd/issues"
+  },
+  "homepage": "https://github.com/burgrp/si-usbd#readme",
+  "silicon": {
+    "sources": [
+      "usb-declarations.cpp",
+      "usb-endpoint.cpp",
+      "usb-interface.cpp",
+      "usb-device.cpp",
+      "usb-control-endpoint.cpp"
+    ]
+  }
+}
