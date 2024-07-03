@@ -27,7 +27,7 @@ namespace usbd {
  *
  * };
  * ```
- * 
+ *
  * Chip midclass must overload following methods:
  * - void init(); - must call UsbDevice::init()
  * - void setAddress(int address);
@@ -188,6 +188,7 @@ public:
    * @param epIndex
    */
   virtual void stall(int epIndex) = 0;
+
 };
 
 void UsbEndpoint::startTx(int length) { device->startTx(index, length); }

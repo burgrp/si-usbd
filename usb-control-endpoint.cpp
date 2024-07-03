@@ -2,10 +2,10 @@ namespace usbd {
 
 /**
  * @brief USB control endpoint implementation class.
- * 
+ *
  * This class does not need to be subclassed. It may be used as is as member of
  * UsbDevice subclass.
- * 
+ *
  * Implements standard device requests. And forwards vendor specific requests to
  * device, interfaces and endpoints.
  *
@@ -91,6 +91,14 @@ public:
 
               interface->checkDescriptor(interfaceDescriptor);
               totalLength += sizeof(InterfaceDescriptor);
+
+              int classDescriptorLength = interface->getClassDescriptorLength();
+              if (classDescriptorLength) {
+                unsigned char *classDescriptor = txBuffer + totalLength;
+                zeromem(classDescriptor, classDescriptorLength);
+                interface->checkClassDescriptor(classDescriptor);
+                totalLength += classDescriptorLength;
+              }
 
               for (int e = 0; UsbEndpoint *endpoint = interface->getEndpoint(e); e++) {
                 for (int direction = 0; direction <= 1; direction++) {

@@ -64,12 +64,30 @@ public:
    * Called when generating interface descriptor.
    *
    * Called internally from the library.
-   * 
+   *
    * May be overloaded to modify the default descriptor.
    *
    * @param interfaceDesriptor
    */
   virtual void checkDescriptor(InterfaceDescriptor *interfaceDesriptor){};
+
+  /**
+   * Called when generating class descriptor.
+   *
+   * May be overloaded to add class specific descriptor.
+   *
+   * @return int
+   */
+  virtual int getClassDescriptorLength() { return 0; }
+
+  /**
+   * Called when generating class descriptor.
+   *
+   * May be overloaded to add class specific descriptor.
+   *
+   * @param buffer
+   */
+  virtual void checkClassDescriptor(unsigned char *buffer) {}
 
   /**
    * Get string identifier of the interface.
