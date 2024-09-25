@@ -61,7 +61,7 @@ public:
 
             device->checkDescriptor(deviceDesriptor);
 
-            startTx(sizeof(DeviceDescriptor));
+            startTx(setupData->wLength < sizeof(DeviceDescriptor) ? setupData->wLength : sizeof(DeviceDescriptor));
 
           } else if (descriptorType == DESCRIPTOR_TYPE_CONFIGURATION) {
 
@@ -165,7 +165,7 @@ public:
                 stringDescriptor->bLength += 2;
               }
             }
-            startTx(stringDescriptor->bLength);
+            startTx(setupData->wLength < stringDescriptor->bLength ? setupData->wLength : stringDescriptor->bLength);
 
           } else {
             startTx(0);
