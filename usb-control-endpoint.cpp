@@ -93,6 +93,8 @@ namespace usbd {
                 interface->checkDescriptor(interfaceDescriptor);
                 totalLength += sizeof(InterfaceDescriptor);
 
+                interface->isVendor = interfaceDescriptor->bDescriptorType == 0xFF;
+
                 int classDescriptorLength = interface->getClassDescriptorLength();
                 if (classDescriptorLength) {
                   unsigned char* classDescriptor = txBuffer + totalLength;
@@ -171,11 +173,55 @@ namespace usbd {
               startTx(setupData->wLength < stringDescriptor->bLength ? setupData->wLength : stringDescriptor->bLength);
 
             }
+            else if (descriptorType == DESCRIPTOR_TYPE_BOS) {
+
+              MicrosoftOS20Descriptor* descriptor = (MicrosoftOS20Descriptor*)txBuffer;
+
+              int totalLength = sizeof(MicrosoftOS20Descriptor);
+              int vendorInterfaceCount = 0;
+
+              descriptor->bcdVersion = 0x0100;
+              descriptor->wIndex = 0x0004;
+              for (int r = 0; r < sizeof(descriptor->Reserved); r++) {
+                descriptor->Reserved[r] = 0;
+              }
+
+              for (int i = 0; UsbInterface * interface = device->getInterface(i); i++) {
+                if (interface->isVendor) {
+                  vendorInterfaceCount++;
+                  WinUSBCompatibleIDDescriptor* vendorDescriptor = (WinUSBCompatibleIDDescriptor*)(txBuffer + totalLength);
+                  vendorDescriptor->bFirstInterfaceNumber = i;
+                  vendorDescriptor->Reserved = 0;
+                  vendorDescriptor->CompatibleID[0] = 'W';
+                  vendorDescriptor->CompatibleID[1] = 'I';
+                  vendorDescriptor->CompatibleID[2] = 'N';
+                  vendorDescriptor->CompatibleID[3] = 'U';
+                  vendorDescriptor->CompatibleID[4] = 'S';
+                  vendorDescriptor->CompatibleID[5] = 'B';
+                  vendorDescriptor->CompatibleID[6] = 0;
+                  vendorDescriptor->CompatibleID[7] = 0;
+                  for (int s = 0; s < sizeof(vendorDescriptor->SubCompatibleID); s++) {
+                    vendorDescriptor->SubCompatibleID[s] = 0;
+                  }
+                  for (int r = 0; r < sizeof(vendorDescriptor->Reserved2); r++) {
+                    vendorDescriptor->Reserved2[r] = 0;
+                  }
+                  totalLength += sizeof(WinUSBCompatibleIDDescriptor);
+                }
+              }
+
+              descriptor->dwLength = totalLength;
+              descriptor->bCount = vendorInterfaceCount;
+              startTx(setupData->wLength < totalLength ? setupData->wLength : totalLength);
+            }
             else {
               startTx(0);
             }
 
+
           }
+
+
           else if (setupData->bRequest == STD_REQUEST_SET_ADDRESS) {
 
             addressToSet = setupData->wValue;
@@ -204,6 +250,7 @@ namespace usbd {
         else {
           device->setup(setupData);
         }
+
 
       }
       else if (setupData->bmRequestType.recipient == INTERFACE) {

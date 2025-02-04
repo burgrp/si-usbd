@@ -13,6 +13,10 @@ namespace usbd {
   const int DESCRIPTOR_TYPE_STRING = 0x03;
   const int DESCRIPTOR_TYPE_INTERFACE = 0x04;
   const int DESCRIPTOR_TYPE_ENDPOINT = 0x05;
+  const int DESCRIPTOR_TYPE_BOS = 0x0F;
+
+  // const int VENDOR_REQUEST_GET_FEATURE_DESCRIPTOR = 0x0F;
+  // const int EXTENDED_COMPATIBILITY_ID_DESCRIPTOR = 0x0004;
 
   class UsbDevice;
   class UsbInterface;
@@ -79,6 +83,24 @@ namespace usbd {
     unsigned char bInterfaceSubclass; // Interface subclass
     unsigned char bInterfaceProtocol; // Interface protocol
     unsigned char iInterface;         // Index to string describing this interface
+  };
+
+  // Device Capability Descriptor (Microsoft OS 1.0)
+  struct __attribute__((packed)) MicrosoftOS20Descriptor {
+    unsigned int dwLength;              // Total length of the descriptor
+    unsigned short bcdVersion;            // Version of MS OS Descriptor (0x0100)
+    unsigned short wIndex;                // Descriptor type index (0x0004 for Compatible ID)
+    unsigned char bCount;                 // Number of function descriptors
+    unsigned char Reserved[7];            // Reserved bytes (7 bytes, must be zero)
+  };
+
+  // Function Subset Header Descriptor (Microsoft OS 1.0)
+  struct __attribute__((packed)) WinUSBCompatibleIDDescriptor {
+    unsigned char bFirstInterfaceNumber;  // Interface number
+    unsigned char Reserved;               // Reserved byte (must be zero)
+    unsigned char CompatibleID[8];        // Compatible ID string (e.g., "WINUSB\0")
+    unsigned char SubCompatibleID[8];     // Sub-Compatible ID string (all zeros for WinUSB)
+    unsigned char Reserved2[6];           // Reserved bytes (6 bytes, must be zero)
   };
 
   enum EndpointTransferType { CONTROL = 0, ISOCHRONOUS = 1, BULK = 2, INTERRUPT = 3 };

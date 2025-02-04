@@ -25,6 +25,13 @@ namespace usbd {
     UsbDevice* device;
 
     /**
+     * Marks the interface as vendor specific.
+     *
+     * This is set internally by the library based on interface type being 0xFF and later used in descriptor generation.
+     */
+    bool isVendor = false;
+
+    /**
      * Interface initialization.
      *
      * Called internally from the library.
